@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-int const posiciones_maximas = 50;
+int const MAXCHAR = 50;
 
 using namespace std;
 
@@ -129,29 +129,235 @@ public:
 
 };
 
-struct Curso {
+
+//Declaracion de clases
+class Instructor;
+class Curso;
+class CursoEstudiante;
+class Estudiante;
+
+class Instructor {
+	private:
+		int id;
+		char nombre[MAXCHAR];
+		char apellido[MAXCHAR];
+		DoubleLinkedList<Curso> cursosDictados;
+
 	public:
-	//private:
-		int codigoCurso;
-		char nombre[posiciones_maximas];
-		char instructor[posiciones_maximas];
-	
-	//public:
-		//
+		void setId(int i) {
+			id = i;
+		}
+
+		void setNombre(string str) {
+			strcpy_s(nombre, str.c_str());
+		}
+
+		void setApellido(string str) {
+			strcpy_s(apellido, str.c_str());
+		}
+
+		void setCursosDictados(DoubleLinkedList<Curso> nuevaLista) {
+			cursosDictados = nuevaLista;
+		}
+
+		int getId() {
+			return id;
+		}
+
+		char* getNombre() {
+			return nombre;
+		}
+
+		char* getApellido() {
+			return apellido;
+		}
+
+		DoubleLinkedList<Curso> getCursosDictados() {
+			return cursosDictados;
+		}
 };
 
-struct Estudiante {
-	public:
+class Curso {
+	protected:
 		int id;
-		char nombre[posiciones_maximas];
-		char apellido[posiciones_maximas];
-		DoubleLinkedList<Curso> listaCursos;
-	//public:
-		//
+		char nombre[MAXCHAR];
+		Instructor instructor;
+
+	private:
+		DoubleLinkedList<Estudiante> listadoEstudiantes;
+
+	public:
+		void setId(int i) {
+			id = i;
+		}
+
+		void setNombre(string str) {
+			strcpy_s(nombre, str.c_str());
+		}
+
+		void setInstructor(Instructor inst) {
+			instructor = inst;
+		}
+
+		void setListadoEst(DoubleLinkedList<Estudiante> listado) {
+			listadoEstudiantes = listado;
+		}
+
+		int getId() {
+			return id;
+		}
+
+		char* getNombre() {
+			return nombre;
+		}
+
+		Instructor getInstructor() {
+			return instructor;
+		}
+
+		DoubleLinkedList<Estudiante> getListado() {
+			return listadoEstudiantes;
+		}
+};
+
+class CursoEstudiante : public Curso {
+	private:
+		int notaFinal;
+		int notasParciales[3] = {-1, -1, -1};
+		bool aprobado = false;
+
+	public:
+		void setNotaFinal(int i) {
+			notaFinal = i;
+		}
+
+		void setNotasParciales(int notas[]) {
+			for (int i = 0; i < 3; i++) {
+				notasParciales[i] = notas[i];
+			}
+		}
+
+		void setAprobado(bool certificado) {
+			aprobado = certificado;
+		}
+
+		int getNotaFinal() {
+			return notaFinal;
+		}
+
+		int* getNotasParciales() {
+			return notasParciales;
+		}
+
+		bool getAprobado() {
+			return aprobado;
+		}
+
+		void calculaCertificado() {
+			int sumatoria = 0;
+
+			for (int i = 0; i < 3; i++) {
+				sumatoria += notasParciales[i];
+			}
+
+			if (sumatoria >= 5) {
+				aprobado = true;
+				cout << "Este estudiante ha aprobado el curso" << endl;
+			}
+			else {
+				aprobado = false;
+				cout << "Este estudiante no ha aprobado el curso" << endl;
+			}
+		}
+
+		void cargarNota(int notaACargar) {
+			int i = 0;
+
+			while (notasParciales[i] != -1) {
+				i++;
+			}
+			if (i == 2 && notasParciales[i] != -1) {
+				cerr << "ERROR: Ya han sido cargadas todas las notas de esta materia a este estudiante." << endl;
+			}
+			else {
+				if (i == 2) {
+					calculaCertificado();
+				}
+				else {
+					notasParciales[i] = notaACargar;
+				}
+			}
+		}
+};
+
+class Estudiante {
+	private:
+		int id;
+		char nombre[MAXCHAR];
+		char apellido[MAXCHAR];
+		DoubleLinkedList<CursoEstudiante> cursosInscritos;
+
+	public:
+		void setId(int newid) {
+			id = newid;
+		}
+
+		void setNombre(string str) {
+			strcpy_s(nombre, str.c_str());
+		}
+
+		void setApellido(string str) {
+			strcpy_s(apellido, str.c_str());
+		}
+
+		void setCursosInscritos(DoubleLinkedList<CursoEstudiante> nuevaLista) {
+			cursosInscritos = nuevaLista;
+		}
+
+		int getId() {
+			return id;
+		}
+
+		char* getNombre() {
+			return nombre;
+		}
+		
+		char* getApellido() {
+			return apellido;
+		}
+
+		DoubleLinkedList<CursoEstudiante> getCursosInscritos() {
+			return cursosInscritos;
+		}
 };
 
 int main(int args, char* argsv[]) {
+
+
 	
+	/*fstream archivo("objeto.bin", ios::out | ios::binary);
+
+
+	estudiante est;
+
+	est.setid(25687494);
+	est.setnombre("Luis Antonio");
+	est.setapellido("Marquez Castro");
+
+	archivo.write(reinterpret_cast<char*> (&est), sizeof(estudiante));
+	archivo.close();
+	
+	est.setid(0);
+	est.setnombre("");
+	est.setapellido("");
+
+	archivo.open("objeto.bin", ios::in | ios::binary);
+
+	archivo.read(reinterpret_cast<char*> (&est), sizeof(estudiante));
+
+	archivo.close();
+	*/
+
 	/*Curso c1, c2, c3, c4, c5;
 	string str;
 
@@ -226,7 +432,9 @@ int main(int args, char* argsv[]) {
 	}
 
 	archivo.close();*/
-	
+
+//======================================================READ==================================================	
+/*
 	Node<Curso>* storeCurse;
 	Estudiante estudianteLeido;
 	storeCurse = NULL;
@@ -257,6 +465,7 @@ int main(int args, char* argsv[]) {
 	delete storeCurse;
 
 	archivo.close();
+*/
 
 	return 0;
 }
