@@ -135,6 +135,7 @@ class Instructor;
 class Curso;
 class CursoEstudiante;
 class Estudiante;
+class moduloMonitoreo;
 
 class Instructor {
 	private:
@@ -329,6 +330,14 @@ class Estudiante {
 		DoubleLinkedList<CursoEstudiante> getCursosInscritos() {
 			return cursosInscritos;
 		}
+};
+
+class ModuloMonitoreo {
+	private:
+		//
+
+	public:
+		//
 };
 
 int main(int args, char* argsv[]) {
