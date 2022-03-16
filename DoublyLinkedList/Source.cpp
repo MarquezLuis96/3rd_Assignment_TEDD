@@ -1,6 +1,7 @@
 //LIBRERIAS
 #include <iostream>
-
+#include <string>
+constexpr auto StringLength = 50;
 //DECLARANDO NOMBRES DE ESPACIO
 using namespace std;
 
@@ -116,6 +117,160 @@ public:
 		sentinel->getPrevious()->setNext(p);
 		sentinel->setPrevious(p);
 	}
+};
+
+class CursoEstudiante {
+	private:
+		char nombreCurso[StringLength];
+		int evalRealiz;
+		int notas[3];
+		int notaFinal;
+		bool cursoTerminado;
+		bool certificado;
+
+		void calcularNotaFinal() {
+			int sumatoria = 0;
+			float promedio = (float) 0;
+			float parte_entera = 0;
+			float parte_decimal = 0;
+
+			for (int i = 0; i < 3; i++) {
+				sumatoria += notas[i];
+			}
+
+			promedio = (float) sumatoria / 3;
+
+			parte_entera = floor(promedio);
+			parte_decimal = promedio - parte_entera;
+
+			if (parte_decimal > 0.5) {
+				promedio = ceil(promedio);
+			}
+			else {
+				promedio = floor(promedio);
+			}
+
+			if (promedio >= 4.5) {
+				cursoTerminado = true;
+				certificado = true;
+				notaFinal = (int) promedio;
+			}
+			else {
+				cursoTerminado = true;
+				certificado = false;
+				notaFinal = (int) promedio;
+			}
+		}
+
+		void terminarCurso() {
+			if (evalRealiz != 3) {
+				cerr << "Error: El curso todavia no ha terminado." << endl;
+			}
+			else {
+				calcularNotaFinal();
+			}
+		}
+
+	public:
+
+		CursoEstudiante() {
+			strcpy_s(nombreCurso, "NO-NAME-COURSE");
+			evalRealiz = 0;
+
+			/*INICIALIZANDO EN VALORES INVALIDOS(NOTAS < 0) PARA QUE NO HAYA BASURA
+			* SINO VALORES QUE INDIQUEN NOTAS NO CARGADAS
+			*/
+			for (int i = 0; i < 3; i++) {
+				notas[i] = -1;
+			}
+
+			notaFinal = -1;
+
+			cursoTerminado = false;
+			certificado = false;
+		}
+
+		CursoEstudiante(string name) {
+			strcpy_s(nombreCurso, name.c_str());
+			evalRealiz = 0;
+
+			/*INICIALIZANDO EN VALORES INVALIDOS(NOTAS < 0) PARA QUE NO HAYA BASURA
+			* SINO VALORES QUE INDIQUEN NOTAS NO CARGADAS
+			*/
+			for (int i = 0; i < 3; i++) {
+				notas[i] = -1;
+			}
+
+			notaFinal = -1;
+
+			cursoTerminado = false;
+			certificado = false;
+		}
+
+		void setNombreCurso(string str) {
+			strcpy_s(nombreCurso, str.c_str());
+		}
+
+		void setEvalRealiz(int i) {
+			evalRealiz = i;
+		}
+
+		void setNotas(int arrNotas[]) {
+			for (int i = 0; i < 3; i++) {
+				notas[i] = arrNotas[i];
+			}
+		}
+
+		void setNotaFinal(int i) {
+			notaFinal = i;
+		}
+
+		void setCursoTerminado(bool booleano) {
+			cursoTerminado = booleano;
+		}
+
+		void setCertificado(bool booleano) {
+			certificado = booleano;
+		}
+
+		char* getNombreCurso() {
+			return nombreCurso;
+		}
+
+		int getEvalRealiz() {
+			return evalRealiz;
+		}
+
+		int* getNotas() {
+			return notas;
+		}
+
+		int getNotaFinal() {
+			return notaFinal;
+		}
+
+		bool getCursoTerminado() {
+			return cursoTerminado;
+		}
+
+		bool getCertificado() {
+			return certificado;
+		}
+
+		bool cargarNota(int nuevaNota) {
+			if (evalRealiz == 3) {
+				cerr << "Error: No se puede cargar nota ya que el curso ha finalizado." << endl;
+				return false;
+			}
+			else {
+				notas[evalRealiz] = nuevaNota;
+				evalRealiz++;
+				
+				if (evalRealiz == 3) {
+					terminarCurso();
+				}
+			}
+		}
 };
 
 //FUNCION PRINCIPAL
