@@ -119,6 +119,55 @@ public:
 	}
 };
 
+class Curso {
+private:
+	int id;
+	char nombreCurso[StringLength];
+	char nombreProfesor[StringLength];
+
+public:
+	Curso() {
+		id = 0;
+		strcpy_s(nombreCurso, "NO-NAME-COURSE");
+		strcpy_s(nombreProfesor, "NO-NAME-PROFESOR");
+	}
+
+	Curso(string str) {
+		id = 0;
+		strcpy_s(nombreCurso, str.c_str());
+	}
+
+	Curso(string curso, string profe) {
+		id = 0;
+		strcpy_s(nombreCurso, curso.c_str());
+		strcpy_s(nombreProfesor, profe.c_str());
+	}
+
+	void setID(int i) {
+		id = i;
+	}
+
+	void setNombreCurso(string str) {
+		strcpy_s(nombreCurso, str.c_str());
+	}
+
+	void setNombreProfesor(string str) {
+		strcpy_s(nombreProfesor, str.c_str());
+	}
+
+	int getID() {
+		return id;
+	}
+
+	char* getNombreCurso() {
+		return nombreCurso;
+	}
+
+	char* getNombreProfesor() {
+		return nombreProfesor;
+	}
+};
+
 class CursoEstudiante {
 	private:
 		char nombreCurso[StringLength];
@@ -282,12 +331,12 @@ class Estudiante {
 	public:
 		Estudiante() {
 			id = 0;
-			strcpy(nombreEstudiante, "NO-NAME-STUDENT");
+			strcpy_s(nombreEstudiante, "NO-NAME-STUDENT");
 		}
 
 		Estudiante(string str) {
 			id = 0;
-			strcpy(nombreEstudiante, str.c_str());
+			strcpy_s(nombreEstudiante, str.c_str());
 		}
 
 		void setID(int i) {
@@ -360,12 +409,20 @@ class Profesor {
 			strcpy_s(nombreProf, str.c_str());
 		}
 
+		void setListaCursos(DoubleLinkedList<CursoProfesor> newList) {
+			listaCursos = newList;
+		}
+
 		int getID() {
 			return id;
 		}
 
 		char* getNombreProf() {
 			return nombreProf;
+		}
+
+		DoubleLinkedList<CursoProfesor> getListaCursos() {
+			return listaCursos;
 		}
 };
 
