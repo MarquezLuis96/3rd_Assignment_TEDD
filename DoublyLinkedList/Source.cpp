@@ -273,6 +273,38 @@ class CursoEstudiante {
 		}
 };
 
+class Estudiante {
+	private:
+		int id;
+		char nombreEstudiante[StringLength];
+		DoubleLinkedList<CursoEstudiante> listaCursos;
+
+	public:
+		void setID(int i) {
+			id = i;
+		}
+
+		void setNombreEstudiante(string str) {
+			strcpy_s(nombreEstudiante, str.c_str());
+		}
+
+		void setListaCursos(DoubleLinkedList<CursoEstudiante> newList) {
+			listaCursos = newList;
+		}
+
+		int getID() {
+			return id;
+		}
+
+		char* getNombreEstudiante() {
+			return nombreEstudiante;
+		}
+
+		DoubleLinkedList<CursoEstudiante> getListaCursos() {
+			return listaCursos;
+		}
+};
+
 //FUNCION PRINCIPAL
 int main(int args, char* argsv[]) {
 	
