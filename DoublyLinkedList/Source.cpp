@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 
-int const MAXCHAR = 50;
+int const MAXCHAR = 25;
 
 using namespace std;
 
@@ -44,15 +45,19 @@ public:
 template <class dataType>
 class DoubleLinkedList {
 private:
-	int nElements;
+	/*static*/ int nElements;
 	Node<dataType>* sentinel;
+
 public:
+
 	DoubleLinkedList() {
 		sentinel = new Node<dataType>;
 		sentinel->setNext(sentinel);
 		sentinel->setPrevious(sentinel);
 		nElements = 0;
 	}
+
+	void incrementNElements() { nElements += 1; }
 
 	int getNElements() { return nElements; }
 
@@ -61,7 +66,7 @@ public:
 		sentinel->getNext()->setPrevious(toAdd);
 		sentinel->setNext(toAdd);
 		toAdd->setPrevious(sentinel);
-		nElements++;
+		nElements = nElements + 1;
 	}
 
 	Node<dataType>* getSentinel() {
@@ -128,12 +133,14 @@ public:
 	}
 
 };
-
+/*template <class dataType>
+int DoubleLinkedList<dataType>::nElements = 0;*/
 
 //Declaracion de clases
 class Instructor;
 class Curso;
 class CursoEstudiante;
+class CursoProfesor;
 class Estudiante;
 class moduloMonitoreo;
 
@@ -142,7 +149,7 @@ class Instructor {
 		int id;
 		char nombre[MAXCHAR];
 		char apellido[MAXCHAR];
-		DoubleLinkedList<Curso> cursosDictados;
+		DoubleLinkedList<CursoProfesor> cursosDictados;
 
 	public:
 		void setId(int i) {
@@ -157,8 +164,8 @@ class Instructor {
 			strcpy_s(apellido, str.c_str());
 		}
 
-		void setCursosDictados(DoubleLinkedList<Curso> nuevaLista) {
-			cursosDictados = nuevaLista;
+		void setCursosDictados(DoubleLinkedList<CursoProfesor> lista) {
+			cursosDictados = lista;
 		}
 
 		int getId() {
@@ -173,18 +180,16 @@ class Instructor {
 			return apellido;
 		}
 
-		DoubleLinkedList<Curso> getCursosDictados() {
+		DoubleLinkedList<CursoProfesor> getCursosDictados() {
 			return cursosDictados;
 		}
 };
 
 class Curso {
-	protected:
+	private:
 		int id;
 		char nombre[MAXCHAR];
-		Instructor instructor;
-
-	private:
+		char instructor[MAXCHAR];
 		DoubleLinkedList<Estudiante> listadoEstudiantes;
 
 	public:
@@ -196,38 +201,58 @@ class Curso {
 			strcpy_s(nombre, str.c_str());
 		}
 
-		void setInstructor(Instructor inst) {
-			instructor = inst;
+		void setInstructor(string inst) {
+			strcpy_s(instructor, inst.c_str());
 		}
 
-		void setListadoEst(DoubleLinkedList<Estudiante> listado) {
-			listadoEstudiantes = listado;
+		void setListadoEstudiantes(DoubleLinkedList<Estudiante> lista) {
+			listadoEstudiantes = lista;
 		}
 
 		int getId() {
 			return id;
 		}
 
-		char* getNombre() {
+		string getNombre() {
 			return nombre;
 		}
 
-		Instructor getInstructor() {
+		char* getInstructor() {
 			return instructor;
 		}
 
-		DoubleLinkedList<Estudiante> getListado() {
+		DoubleLinkedList<Estudiante> getListadoEstudiantes() {
 			return listadoEstudiantes;
 		}
 };
 
-class CursoEstudiante : public Curso {
+class CursoProfesor {
 	private:
-		int notaFinal;
-		int notasParciales[3] = {-1, -1, -1};
-		bool aprobado = false;
+		char nombreCurso[MAXCHAR];
 
 	public:
+		void setNombreCurso(string str) {
+			strcpy_s(nombreCurso, str.c_str());
+		}
+
+		char* getNombreCurso() {
+			return nombreCurso;
+		}
+};
+
+class CursoEstudiante {
+	private:
+		char nombreCurso[MAXCHAR];
+		/*static*/ int notaFinal = 0;
+		/*static*/ int notasParciales[3] = {-1, -1, -1};
+		/*static*/ bool terminado = false;
+		/*static*/ bool aprobado = false;
+
+	public:
+		void setNombreCurso(string str) {
+			strcpy_s(nombreCurso, str.c_str());
+		}
+
 		void setNotaFinal(int i) {
 			notaFinal = i;
 		}
@@ -254,6 +279,10 @@ class CursoEstudiante : public Curso {
 			return aprobado;
 		}
 
+		string getNombre() {
+			return nombreCurso;
+		}
+
 		void calculaCertificado() {
 			int sumatoria = 0;
 
@@ -263,10 +292,12 @@ class CursoEstudiante : public Curso {
 
 			if (sumatoria >= 5) {
 				aprobado = true;
+				terminado = true;
 				cout << "Este estudiante ha aprobado el curso" << endl;
 			}
 			else {
 				aprobado = false;
+				terminado = true;
 				cout << "Este estudiante no ha aprobado el curso" << endl;
 			}
 		}
@@ -290,13 +321,24 @@ class CursoEstudiante : public Curso {
 			}
 		}
 };
+/*int CursoEstudiante::notaFinal = 0;
+int CursoEstudiante::notasParciales[3] = { -1, -1, -1 };
+bool CursoEstudiante::terminado = false;
+bool CursoEstudiante::aprobado = false;*/
 
+/*
+		static char nombreCurso[MAXCHAR];
+		static int notaFinal = 0;
+		static int notasParciales[3] = {-1, -1, -1};
+		static bool terminado = false;
+		static bool aprobado = false;
+*/
 class Estudiante {
 	private:
 		int id;
 		char nombre[MAXCHAR];
 		char apellido[MAXCHAR];
-		DoubleLinkedList<CursoEstudiante> cursosInscritos;
+		DoubleLinkedList<CursoEstudiante> cursos;
 
 	public:
 		void setId(int newid) {
@@ -311,8 +353,8 @@ class Estudiante {
 			strcpy_s(apellido, str.c_str());
 		}
 
-		void setCursosInscritos(DoubleLinkedList<CursoEstudiante> nuevaLista) {
-			cursosInscritos = nuevaLista;
+		void setCursos(DoubleLinkedList<CursoEstudiante> lista) {
+			cursos = lista;
 		}
 
 		int getId() {
@@ -327,23 +369,354 @@ class Estudiante {
 			return apellido;
 		}
 
-		DoubleLinkedList<CursoEstudiante> getCursosInscritos() {
-			return cursosInscritos;
+		DoubleLinkedList<CursoEstudiante> getCursos() {
+			return cursos;
 		}
 };
 
 class ModuloMonitoreo {
 	private:
-		//
+		DoubleLinkedList<Instructor> listadoInstructores;
+		DoubleLinkedList<Curso> listadoCursos;
+		DoubleLinkedList<Estudiante> listadoEstudiantes;
 
 	public:
-		//
+		void setListadoInstructores(DoubleLinkedList<Instructor> listado) {
+			listadoInstructores = listado;
+		}
+
+		void setListadoCursos(DoubleLinkedList<Curso> listado) {
+			listadoCursos = listado;
+		}
+
+		void setListadoEstudiantes(DoubleLinkedList<Estudiante> listado) {
+			listadoEstudiantes = listado;
+		}
+
+		DoubleLinkedList<Instructor> getListadoInstructores() {
+			return listadoInstructores;
+		}
+
+		DoubleLinkedList<Curso> getListadoCurso() {
+			return listadoCursos;
+		}
+
+		DoubleLinkedList<Estudiante> getListadoEstudiantes() {
+			return listadoEstudiantes;
+		}
+
+		void imprimirCursosDisp() {
+			if (listadoCursos.getNElements() == 0) {
+				cout << "No hay cursos Disponibles" << endl;
+			}
+			else {
+				Node<Curso>* currentCourse;
+				Node<Curso>* sentinel;
+
+				sentinel = listadoCursos.getSentinel();
+				currentCourse = sentinel->getPrevious();
+				cout << "Cursos disponibles: " << endl;
+				while (currentCourse != sentinel) {
+					
+					cout << "Nombre Curso: " << currentCourse->getKey().getNombre() << endl;
+					cout << "ID: " << currentCourse->getKey().getId() << endl << endl;
+					
+					currentCourse = currentCourse->getPrevious();
+				}
+			}
+		}
+
+		Node<Estudiante>* buscarEstudiante(int id) {
+			if (listadoCursos.getNElements() == 0) {
+				cout << "No hay estudiantes" << endl;
+			}
+			else {
+				Node<Estudiante>* currentEst;
+				Node<Estudiante>* sentinel;
+
+				sentinel = listadoEstudiantes.getSentinel();
+				currentEst = sentinel->getPrevious();
+				while (currentEst != sentinel) {
+					if (currentEst->getKey().getId() == id) {
+						return currentEst;
+					}
+					currentEst = currentEst->getPrevious();
+				}
+			}
+			cout << "Estudiante no encontrado" << endl;
+			return NULL;
+		}
+
+		Node<Curso>* buscarCurso(int id) {
+			if (listadoCursos.getNElements() == 0) {
+				cout << "No hay cursos Disponibles" << endl;
+			}
+			else {
+				Node<Curso>* currentCourse;
+				Node<Curso>* sentinel;
+
+				sentinel = listadoCursos.getSentinel();
+				currentCourse = sentinel->getPrevious();
+				while (currentCourse != sentinel) {
+					if (currentCourse->getKey().getId() == id) {
+						return currentCourse;
+					}
+					currentCourse = currentCourse->getPrevious();
+				}
+			}
+			cout << "Curso no encontrado" << endl;
+			return NULL;
+		}
+
+		Node<Instructor>* buscarProfesorAgregarCurso(int id) {
+			if (listadoInstructores.getNElements() == 0) {
+				cout << "No hay profesores disponibles" << endl;
+			}
+			else {
+				Node<Instructor>* currentProfesor;
+				Node<Instructor>* sentinel;
+
+				sentinel = listadoInstructores.getSentinel();
+				currentProfesor = sentinel->getPrevious();
+
+				while (currentProfesor != sentinel) {
+					
+					if (currentProfesor->getKey().getId() == id) {
+						return currentProfesor;
+					}
+
+					currentProfesor = currentProfesor->getPrevious();
+				}
+			}
+			return NULL;
+		}
+
+		void crearProfesor() {
+			int id;
+			string str;
+			Instructor profesorClave;
+			Node<Instructor>* ProfesorNodo = NULL;
+
+			cout << "Ingrese la CI del profesor: ";
+			cin >> id; cout << endl;
+			profesorClave.setId(id);
+
+			cout << "Ingrese el nombre del profesor: ";
+			cin >> str; cout << endl;
+			profesorClave.setNombre(str);
+
+			cout << "Ingrese el apellido del profesor: ";
+			cin >> str; cout << endl;
+			profesorClave.setApellido(str);
+
+			ProfesorNodo = new Node<Instructor>;
+			ProfesorNodo->setKey(profesorClave);
+
+			listadoInstructores.addNode(ProfesorNodo);
+
+			cout << "Profesor agregado exitosamente" << endl;
+
+		}
+
+		void crearCurso() {
+			int id;
+			string str;
+			Curso cursoClave;
+			Node<Curso>* cursoNode = NULL;
+
+			cout << "Ingrese el ID del curso: ";
+			cin >> id; cout << endl;
+			cursoClave.setId(id);
+
+			cout << "Ingrese el nombre del curso: ";
+			cin >> str; cout << endl;
+			cursoClave.setNombre(str);
+
+			cursoNode = new Node<Curso>;
+			cursoNode->setKey(cursoClave);
+
+			listadoCursos.addNode(cursoNode);
+
+			cout << "Curso creado con exito" << endl;
+		}
+
+		void agregarCursoProfesor(int idCurso, int idProf) {
+			Node<Curso>* curso;
+			Node<Instructor>* profesor;
+			curso = buscarCurso(idCurso);
+			profesor = buscarProfesorAgregarCurso(idProf);
+
+			Instructor profesorAux;
+
+			Node<CursoProfesor>* cursoProfNodo = NULL;
+			CursoProfesor cursoProfKey;
+
+			cursoProfKey.setNombreCurso(curso->getKey().getNombre());
+			cursoProfNodo = new Node<CursoProfesor>;
+			cursoProfNodo->setKey(cursoProfKey);
+
+			profesor->getKey().getCursosDictados().addNode(cursoProfNodo);
+			Instructor proobj = profesor->getKey();
+			
+			Curso cursoaux = curso->getKey();
+			cursoaux.setInstructor(proobj.getNombre());
+			curso->setKey(cursoaux);
+
+			cout << "nElementos = " << profesor->getKey().getCursosDictados().getNElements() << endl;
+
+			cout << "Agregado curso a prof y prof a curso" << endl;
+
+		}
+
+		void crearEstudiante() {
+			int idCurso;
+			if (listadoCursos.getNElements() == 0) {
+				cout << "No se puede agregar estudiante ya que no existen cursos." << endl;
+				cout << "Primero cree un curso, agregue instructor y luego agregue el estudiante." << endl;
+			}
+			else {
+				cout << "Listado de cursos disponibles: " << endl;
+				imprimirCursosDisp();
+
+				cout << "Ingrese el ID del curso al cual desea agregar al estudiante: ";
+				cin >> idCurso; cout << endl;
+			}
+
+			int id;
+			string str;
+			Estudiante estudianteClave;
+			Node<Estudiante>* estudianteNode = NULL;
+			Node<Curso>* cursoAgregar = NULL;
+			CursoEstudiante cursoObjeto;
+			Node<CursoEstudiante>* cursoEstudianteNode = NULL;
+
+			cursoAgregar = buscarCurso(idCurso);
+
+			cout << "Ingrese CI del estudiante: ";
+			cin >> id; cout << endl;
+			estudianteClave.setId(id);
+
+			cout << "Ingrese el nombre del estudiante: ";
+			cin >> str; cout << endl;
+			estudianteClave.setNombre(str);
+
+			cout << "Ingrese el apellido del estudiante: ";
+			cin >> str; cout << endl;
+			estudianteClave.setApellido(str);
+
+			cursoObjeto.setNombreCurso(cursoAgregar->getKey().getNombre());
+
+			cursoEstudianteNode = new Node<CursoEstudiante>;
+			cursoEstudianteNode->setKey(cursoObjeto);
+
+			estudianteClave.getCursos().addNode(cursoEstudianteNode);
+
+			estudianteNode = new Node<Estudiante>;
+			estudianteNode->setKey(estudianteClave);
+
+			cursoAgregar->getKey().getListadoEstudiantes().addNode(estudianteNode);
+
+			listadoEstudiantes.addNode(estudianteNode);
+
+			cout << "Estudiante Inscrito Exitosamente... " << endl;
+		}
+
+		void cargarNotas() {
+
+			int id;
+
+			imprimirCursosDisp();
+
+			cout << "Ingrese ID de la materia a la cual cargar notas: ";
+			cin >> id; cout << endl;
+
+			Node<Curso>* cursoCargarNotas = NULL;
+			cursoCargarNotas = buscarCurso(id);
+
+			Node<Estudiante>* EstudianteSentinelCurso = NULL;
+			EstudianteSentinelCurso = cursoCargarNotas->getKey().getListadoEstudiantes().getSentinel();
+
+			Node<Estudiante>* EstudianteActualCurso = NULL;
+			EstudianteActualCurso = EstudianteSentinelCurso->getPrevious();
+
+			while (EstudianteActualCurso != EstudianteSentinelCurso) {
+				Node<Estudiante>* EstudianteEnListado = NULL;
+				EstudianteEnListado = buscarEstudiante(EstudianteActualCurso->getKey().getId());
+				
+				int nota = 0;
+				cout << "Estudiante: " << EstudianteEnListado->getKey().getNombre() << endl;
+				cout << "Ingrese la nota del examen a cargar: ";
+				cin >> nota; cout << endl;
+
+				Node<CursoEstudiante>* sentinelCursoListado = NULL;
+				sentinelCursoListado = EstudianteEnListado->getKey().getCursos().getSentinel();
+
+				Node<CursoEstudiante>* currentCursoListado = NULL;
+				currentCursoListado = sentinelCursoListado->getPrevious();
+
+				while (currentCursoListado != sentinelCursoListado) {
+					if (currentCursoListado->getKey().getNombre() == cursoCargarNotas->getKey().getNombre()) {
+						currentCursoListado->getKey().cargarNota(nota);
+						break;
+					}
+					if (currentCursoListado->getPrevious() == sentinelCursoListado) {
+						break;
+					}
+					else {
+						currentCursoListado = currentCursoListado->getPrevious();
+					}
+				}
+
+				if (EstudianteActualCurso->getPrevious() == EstudianteSentinelCurso || EstudianteActualCurso->getPrevious()->getKey().getId() < 0) {
+					break;
+				}
+				else {
+					EstudianteActualCurso = EstudianteActualCurso->getPrevious();
+				}
+			}
+
+		}
+
+		void verificarnotasloly() {
+			Node<Estudiante>* current = listadoEstudiantes.getSentinel()->getPrevious();
+
+			cout << "PrimeraNota: " << endl;
+			cout << "EST: " << current->getKey().getNombre() << endl;
+			cout << "NOTA:" << current->getKey().getCursos().getSentinel()->getPrevious()->getKey().getNotasParciales()[0] << endl;
+		}
+
+		void verificarnotasmary() {
+			Node<Estudiante>* current = listadoEstudiantes.getSentinel()->getPrevious()->getPrevious();
+
+			cout << "PrimeraNota: " << endl;
+			cout << "EST: " << current->getKey().getNombre() << endl;
+			cout << "NOTA:" << current->getKey().getCursos().getSentinel()->getPrevious()->getKey().getNotasParciales()[0] << endl;
+		}
+
+		void verificarnotassofi() {
+			Node<Estudiante>* current = listadoEstudiantes.getSentinel()->getPrevious()->getPrevious()->getPrevious();
+
+			cout << "PrimeraNota: " << endl;
+			cout << "EST: " << current->getKey().getNombre() << endl;
+			cout << "NOTA:" << current->getKey().getCursos().getSentinel()->getPrevious()->getKey().getNotasParciales()[0] << endl;
+		}
+
 };
 
 int main(int args, char* argsv[]) {
 
+	ModuloMonitoreo monitoreo;
 
-	
+	monitoreo.crearCurso();
+	monitoreo.crearProfesor();
+	monitoreo.agregarCursoProfesor(1, 25687494);
+	monitoreo.crearEstudiante();
+	monitoreo.crearEstudiante();
+	monitoreo.crearEstudiante();
+	monitoreo.cargarNotas();
+	monitoreo.verificarnotasloly();
+	monitoreo.verificarnotasmary();
+	monitoreo.verificarnotassofi();
 	/*fstream archivo("objeto.bin", ios::out | ios::binary);
 
 
