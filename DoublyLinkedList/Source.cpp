@@ -426,6 +426,38 @@ class Profesor {
 		}
 };
 
+class ModuloMonitoreo {
+	private:
+		DoubleLinkedList<Curso> listadoCursos;
+		DoubleLinkedList<Estudiante> listadoEstudiantes;
+		DoubleLinkedList<Profesor> listadoProfesores;
+
+	public:
+		void setListadoCursos(DoubleLinkedList<Curso> data) {
+			listadoCursos = data;
+		}
+
+		void setListadoEstudiantes(DoubleLinkedList<Estudiante> data) {
+			listadoEstudiantes = data;
+		}
+
+		void setListadoProfesores(DoubleLinkedList<Profesor> data) {
+			listadoProfesores = data;
+		}
+
+		DoubleLinkedList<Curso> getListadoCursos() {
+			return listadoCursos;
+		}
+
+		DoubleLinkedList<Estudiante> getListadoEstudiantes() {
+			return listadoEstudiantes;
+		}
+
+		DoubleLinkedList<Profesor> getListadoProfesores() {
+			return listadoProfesores;
+		}
+};
+
 //FUNCION PRINCIPAL
 int main(int args, char* argsv[]) {
 	
