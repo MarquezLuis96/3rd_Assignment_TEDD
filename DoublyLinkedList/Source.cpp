@@ -482,11 +482,11 @@ class ModuloMonitoreo {
 			bool disponible = false;
 			Node<Curso>* sentinel = listadoCursos.getSentinel();
 			Node<Curso>* current = sentinel->getPrevious();
-			cout << "Cursos disponibles (Sin profesor agregado): " << endl << endl;
+			cout << "Cursos disponibles: " << endl << endl;
 
 			while (current != sentinel) {
 				if ((string)current->getKey().getNombreProfesor() != (string)"NO-NAME-PROFESOR" && (string)current->getKey().getNombreCurso() != (string)"NO-NAME-COURSE") {
-					cout << "Nombre Curso: " << current->getKey().getNombreCurso() << "Codigo Curso: ";
+					cout << "Nombre Curso: " << current->getKey().getNombreCurso() << "\tCodigo Curso : ";
 					cout << current->getKey().getID() << endl;
 					disponible = true;
 				}
@@ -496,6 +496,18 @@ class ModuloMonitoreo {
 
 			if (current == sentinel && disponible == false) {
 				cerr << "Error: No hay cursos disponibles, ingrese -1 para salir." << endl;
+			}
+		}
+
+		void imprimirListaProfs() {
+			Node<Profesor>* sentinel = listadoProfesores.getSentinel();
+			Node<Profesor>* current = sentinel->getPrevious();
+
+			while (current != sentinel) {
+				
+				cout << "Nombre: " << current->getKey().getNombreProf() << "\t C.I: " << current->getKey().getID() << endl;
+
+				current = current->getPrevious();
 			}
 		}
 
@@ -511,6 +523,25 @@ class ModuloMonitoreo {
 
 				current = current->getPrevious();
 				
+				if (current == sentinel) {
+					cerr << "Error: El id ingresado no se encuentra en la lista." << endl;
+					return NULL;
+				}
+			}
+		}
+
+		Node<Profesor>* buscarProfesor(int id) {
+			Node<Profesor>* sentinel = listadoProfesores.getSentinel();
+			Node<Profesor>* current = sentinel->getPrevious();
+
+			while (current != sentinel) {
+
+				if (current->getKey().getID() == id) {
+					return current;
+				}
+
+				current = current->getPrevious();
+
 				if (current == sentinel) {
 					cerr << "Error: El id ingresado no se encuentra en la lista." << endl;
 					return NULL;
@@ -668,11 +699,73 @@ class ModuloMonitoreo {
 			listadoEstudiantes.addNode(nodeNuevoEstudiante);
 		}
 
-		void agregarCursoAProf() {}
+		void agregarCursoAProf() {
+			int intaux;
+			Node<Curso>* searchResultCurso = NULL;
+			Node<Profesor>* searchResultProfesor = NULL;
+
+			do {
+				imprimirCursosDisponiblesAProfesores();
+				cout << "Ingrese codigo del curso a agregar: ";
+				cin >> intaux; cout << endl;
+				
+				if (intaux == -1) {
+					return;
+				}
+
+				searchResultCurso = buscarCurso(intaux);
+				if (searchResultCurso == NULL) {
+					continue;
+				}
+				else {
+					break;
+				}
+
+			} while (true);
+
+			do {
+				cout << "Profesores disponibles para agregar cursos: " << endl;
+				imprimirListaProfs();
+				cout << "Ingrese C.I: del profesor al que va a agegar el curso: ";
+				cin >> intaux; cout << endl;
+				
+				if (intaux == -1) {
+					return;
+				}
+
+				searchResultProfesor = buscarProfesor(intaux);
+				if (searchResultProfesor == NULL) {
+					continue;
+				}
+				else {
+					break;
+				}
+			} while (true);
+
+			Profesor profesorModificable = searchResultProfesor->getKey();
+			Curso cursoModificable = searchResultCurso->getKey();
+
+			Node<CursoProfesor>* nodeNuevoCurso = NULL;
+			CursoProfesor nuevoCurso;
+
+			nuevoCurso.setNombreCurso(cursoModificable.getNombreCurso());
+			nodeNuevoCurso = new Node<CursoProfesor>;
+			nodeNuevoCurso->setKey(nuevoCurso);
+			profesorModificable.getListaCursos().addNode(nodeNuevoCurso);
+
+			DoubleLinkedList<CursoProfesor> nuevaLista = profesorModificable.getListaCursos();
+			nuevaLista.incrementNElements();
+			profesorModificable.setListaCursos(nuevaLista);
+
+			searchResultProfesor->setKey(profesorModificable);
+
+			cursoModificable.setNombreProfesor(profesorModificable.getNombreProf());
+			searchResultCurso->setKey(cursoModificable);
+
+			cout << "Curso agregado a profesor... " << endl;
+		}
 
 		void agregarCursoAEstu() {}
-
-		void agregarProfACurso() {}
 };
 
 //FUNCION PRINCIPAL
@@ -682,12 +775,17 @@ int main(int args, char* argsv[]) {
 
 	moduloPrueba.crearCurso();
 	moduloPrueba.crearCurso();
+	moduloPrueba.crearCurso();
+	moduloPrueba.crearCurso();
 
 	moduloPrueba.crearProfesor();
 	moduloPrueba.crearProfesor();
 
 	moduloPrueba.crearEstudiante();
 	moduloPrueba.crearEstudiante();
+
+	moduloPrueba.agregarCursoAProf();
+	moduloPrueba.agregarCursoAProf();
 
 	return 0;
 }
