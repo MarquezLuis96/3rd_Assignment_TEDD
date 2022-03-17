@@ -549,6 +549,25 @@ class ModuloMonitoreo {
 			}
 		}
 
+		Node<Estudiante>* buscarEstudiante(int id) {
+			Node<Estudiante>* sentinel = listadoEstudiantes.getSentinel();
+			Node<Estudiante>* current = sentinel->getPrevious();
+
+			while (current != sentinel) {
+
+				if (current->getKey().getID() == id) {
+					return current;
+				}
+
+				current = current->getPrevious();
+
+				if (current == sentinel) {
+					cerr << "Error: El id ingresado no se encuentra en la lista." << endl;
+					return NULL;
+				}
+			}
+		}
+
 		void crearCurso() {
 			int intaux;
 			char straux[StringLength];
@@ -765,7 +784,65 @@ class ModuloMonitoreo {
 			cout << "Curso agregado a profesor... " << endl;
 		}
 
-		void agregarCursoAEstu() {}
+		void agregarCursoAEstu() {
+			int intaux;
+
+			cout << "Ingrese la C.I del estudiante al cual desea agregar curso: ";
+			cin >> intaux; cout << endl;
+			
+			Node<Curso>* searchResultCurso = NULL;
+			Curso cursoModificable;
+
+			Node<Estudiante>* searchResultEstudiante = NULL;
+			Estudiante estudianteModificable;
+
+			searchResultEstudiante = buscarEstudiante(intaux);
+
+			if (searchResultEstudiante == NULL) {
+				return;
+			}
+			else {
+				estudianteModificable = searchResultEstudiante->getKey();
+			}
+			
+			do {
+				imprimirCursosDisponiblesAEstudiantes();
+				cout << endl << "Ingrese codigo del curso a agregar al estudiante " << searchResultEstudiante->getKey().getNombreEstudiante() << endl;
+				cout << "Codigo: ";
+				cin >> intaux; cout << endl;
+
+				if (intaux == -1) {
+					return;
+				}
+
+				searchResultCurso = buscarCurso(intaux);
+
+				if (searchResultCurso == NULL) {
+					return;
+				}
+				else {
+					cursoModificable = searchResultCurso->getKey();
+					break;
+				}
+
+			} while (true);
+
+			Node<CursoEstudiante>* nodeCursoEstudiante = NULL;
+			CursoEstudiante cursoEstudiante;
+			DoubleLinkedList<CursoEstudiante> listaCursoEstudiante;
+
+			cursoEstudiante.setNombreCurso(cursoModificable.getNombreCurso());
+			nodeCursoEstudiante = new Node<CursoEstudiante>;
+			nodeCursoEstudiante->setKey(cursoEstudiante);
+
+			estudianteModificable.getListaCursos().addNode(nodeCursoEstudiante);
+			listaCursoEstudiante = estudianteModificable.getListaCursos();
+			listaCursoEstudiante.incrementNElements();
+			estudianteModificable.setListaCursos(listaCursoEstudiante);
+			searchResultEstudiante->setKey(estudianteModificable);
+
+			cout << "Curso agregado a estudiante" << endl;
+		}
 };
 
 //FUNCION PRINCIPAL
@@ -787,5 +864,9 @@ int main(int args, char* argsv[]) {
 	moduloPrueba.agregarCursoAProf();
 	moduloPrueba.agregarCursoAProf();
 
+
+	moduloPrueba.agregarCursoAEstu();
+	moduloPrueba.agregarCursoAEstu();
+	moduloPrueba.agregarCursoAEstu();
 	return 0;
 }
