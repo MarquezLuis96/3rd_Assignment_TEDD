@@ -426,10 +426,268 @@ class Profesor {
 		}
 };
 
+class ModuloMonitoreo {
+	private:
+		DoubleLinkedList<Curso> listadoCursos;
+		DoubleLinkedList<Estudiante> listadoEstudiantes;
+		DoubleLinkedList<Profesor> listadoProfesores;
+
+	public:
+		void setListadoCursos(DoubleLinkedList<Curso> data) {
+			listadoCursos = data;
+		}
+
+		void setListadoEstudiantes(DoubleLinkedList<Estudiante> data) {
+			listadoEstudiantes = data;
+		}
+
+		void setListadoProfesores(DoubleLinkedList<Profesor> data) {
+			listadoProfesores = data;
+		}
+
+		DoubleLinkedList<Curso> getListadoCursos() {
+			return listadoCursos;
+		}
+
+		DoubleLinkedList<Estudiante> getListadoEstudiantes() {
+			return listadoEstudiantes;
+		}
+
+		DoubleLinkedList<Profesor> getListadoProfesores() {
+			return listadoProfesores;
+		}
+
+		void imprimirCursosDisponiblesAProfesores() {
+			bool disponible = false;
+			Node<Curso>* sentinel = listadoCursos.getSentinel();
+			Node<Curso>* current = sentinel->getPrevious();
+			cout << "Cursos disponibles (Sin profesor agregado): " << endl << endl;
+
+				while (current != sentinel) {
+					if ((string)current->getKey().getNombreProfesor() == (string)"NO-NAME-PROFESOR") {
+						cout << "Nombre Curso: " << current->getKey().getNombreCurso() << "Codigo Curso: ";
+						cout << current->getKey().getID() << endl;
+						disponible = true;
+					}
+
+					current = current->getPrevious();
+				}
+
+				if (current == sentinel && disponible == false) {
+					cerr << "Error: No hay cursos disponibles, ingrese -1 para salir." << endl;
+				}
+		}
+
+		void imprimirCursosDisponiblesAEstudiantes() {
+			bool disponible = false;
+			Node<Curso>* sentinel = listadoCursos.getSentinel();
+			Node<Curso>* current = sentinel->getPrevious();
+			cout << "Cursos disponibles (Sin profesor agregado): " << endl << endl;
+
+			while (current != sentinel) {
+				if ((string)current->getKey().getNombreProfesor() != (string)"NO-NAME-PROFESOR" && (string)current->getKey().getNombreCurso() != (string)"NO-NAME-COURSE") {
+					cout << "Nombre Curso: " << current->getKey().getNombreCurso() << "Codigo Curso: ";
+					cout << current->getKey().getID() << endl;
+					disponible = true;
+				}
+
+				current = current->getPrevious();
+			}
+
+			if (current == sentinel && disponible == false) {
+				cerr << "Error: No hay cursos disponibles, ingrese -1 para salir." << endl;
+			}
+		}
+
+		Node<Curso>* buscarCurso(int id) {
+			Node<Curso>* sentinel = listadoCursos.getSentinel();
+			Node<Curso>* current = sentinel->getPrevious();
+
+			while (current != sentinel) {
+
+				if (current->getKey().getID() == id) {
+					return current;
+				}
+
+				current = current->getPrevious();
+				
+				if (current == sentinel) {
+					cerr << "Error: El id ingresado no se encuentra en la lista." << endl;
+					return NULL;
+				}
+			}
+		}
+
+		void crearCurso() {
+			int intaux;
+			char straux[StringLength];
+			Curso nuevoCurso;
+			Node<Curso>* nodeCurso = NULL;
+
+			cout << "Ingese el codigo del curso: ";
+			cin >> intaux; cout << endl;
+
+			nuevoCurso.setID(intaux);
+
+			cout << "Ingrese nombre del curso: ";
+			cin.ignore();
+			cin.getline(straux, StringLength, '\n');
+			cout << endl;
+
+			nuevoCurso.setNombreCurso(straux);
+
+			nodeCurso = new Node<Curso>;
+			nodeCurso->setKey(nuevoCurso);
+
+			listadoCursos.addNode(nodeCurso);
+		}
+
+		void crearProfesor() {
+			int intaux;
+			char straux[StringLength];
+			Profesor nuevoProfesor;
+			Node<Profesor>* nodeProfesor = NULL;
+
+			cout << "Ingese CI del profesor: ";
+			cin >> intaux; cout << endl;
+
+			nuevoProfesor.setID(intaux);
+
+			cout << "Ingrese nombre del profesor en el formato (Nombre Apellido): ";
+			cin.ignore();
+			cin.getline(straux, StringLength, '\n');
+			cout << endl;
+
+			nuevoProfesor.setNombreProf(straux);
+
+			Node<Curso>* searchResult = NULL;
+			do {
+				imprimirCursosDisponiblesAProfesores();
+				cout << endl;
+				cout << "Ingrese el codigo de la materia que desea agregar al profesor " << nuevoProfesor.getNombreProf() << endl;
+				cout << "Codigo: ";
+				cin >> intaux; cout << endl;
+
+				if (intaux == -1) {
+					return;
+				}
+
+				searchResult = buscarCurso(intaux);
+				if (searchResult == NULL) {
+					continue;
+				}
+				else {
+					break;
+				}
+
+			} while (true);
+
+			Node<CursoProfesor>* nodeCursoProf = NULL;
+			CursoProfesor cursoProf;
+
+			cursoProf.setNombreCurso(searchResult->getKey().getNombreCurso());
+
+			nodeCursoProf = new Node<CursoProfesor>;
+			nodeCursoProf->setKey(cursoProf);
+			nuevoProfesor.getListaCursos().addNode(nodeCursoProf);
+			nuevoProfesor.getListaCursos().incrementNElements();
+
+			DoubleLinkedList<CursoProfesor> listaCursoProfAux = nuevoProfesor.getListaCursos();
+			listaCursoProfAux.incrementNElements();
+			nuevoProfesor.setListaCursos(listaCursoProfAux);
+
+			Curso auxiliarKey = searchResult->getKey();
+			auxiliarKey.setNombreProfesor(nuevoProfesor.getNombreProf());
+			searchResult->setKey(auxiliarKey);
+
+
+
+			nodeProfesor = new Node<Profesor>;
+			nodeProfesor->setKey(nuevoProfesor);
+
+			listadoProfesores.addNode(nodeProfesor);
+		}
+
+		void crearEstudiante() {
+			
+			char straux[StringLength];
+			int intaux;
+			Node<Estudiante>* nodeNuevoEstudiante = NULL;
+			Estudiante nuevoEstudiante;
+
+			cout << "Ingese CI del Estudiante: ";
+			cin >> intaux; cout << endl;
+
+			nuevoEstudiante.setID(intaux);
+
+			cout << "Ingrese nombre del estudiante en el formato (Nombre Apellido): ";
+			cin.ignore();
+			cin.getline(straux, StringLength, '\n');
+			cout << endl;
+
+			nuevoEstudiante.setNombreEstudiante(straux);
+
+			Node<Curso>* searchResult = NULL;
+			do {
+				imprimirCursosDisponiblesAEstudiantes();
+				cout << endl;
+				cout << "Ingrese el codigo de la materia que desea inscribir al estudiante " << nuevoEstudiante.getNombreEstudiante() << endl;
+				cout << "Codigo: ";
+				cin >> intaux; cout << endl;
+
+				if (intaux == -1) {
+					return;
+				}
+
+				searchResult = buscarCurso(intaux);
+				if (searchResult == NULL) {
+					continue;
+				}
+				else {
+					break;
+				}
+
+			} while (true);
+
+			
+			Node<CursoEstudiante>* nodeCursoEstudiante;
+			CursoEstudiante cursoEstudiante;
+
+			nodeCursoEstudiante = new Node<CursoEstudiante>;
+			cursoEstudiante.setNombreCurso(searchResult->getKey().getNombreCurso());
+			nodeCursoEstudiante->setKey(cursoEstudiante);
+
+			nuevoEstudiante.getListaCursos().addNode(nodeCursoEstudiante);
+			DoubleLinkedList<CursoEstudiante> listaCursoEstudianteAux = nuevoEstudiante.getListaCursos();
+			listaCursoEstudianteAux.incrementNElements();
+			nuevoEstudiante.setListaCursos(listaCursoEstudianteAux);
+
+
+			nodeNuevoEstudiante = new Node<Estudiante>;
+			nodeNuevoEstudiante->setKey(nuevoEstudiante);
+			listadoEstudiantes.addNode(nodeNuevoEstudiante);
+		}
+
+		void agregarCursoAProf() {}
+
+		void agregarCursoAEstu() {}
+
+		void agregarProfACurso() {}
+};
+
 //FUNCION PRINCIPAL
 int main(int args, char* argsv[]) {
 	
-	cout << "Hola Mundo" << endl;
+	ModuloMonitoreo moduloPrueba;
+
+	moduloPrueba.crearCurso();
+	moduloPrueba.crearCurso();
+
+	moduloPrueba.crearProfesor();
+	moduloPrueba.crearProfesor();
+
+	moduloPrueba.crearEstudiante();
+	moduloPrueba.crearEstudiante();
 
 	return 0;
 }
