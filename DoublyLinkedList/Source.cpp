@@ -1,6 +1,14 @@
+/*
+	Integrantes:
+		Luis Marquez
+		Carlos Pedraza
+*/
+
 //LIBRERIAS
 #include <iostream>
 #include <string>
+#include <fstream>
+
 constexpr auto StringLength = 50;
 //DECLARANDO NOMBRES DE ESPACIO
 using namespace std;
@@ -843,6 +851,116 @@ class ModuloMonitoreo {
 
 			cout << "Curso agregado a estudiante" << endl;
 		}
+
+		void cargarNotaCurso() {
+			int intaux;
+			char straux[StringLength];
+
+			imprimirCursosDisponiblesAEstudiantes();
+			cout << "Ingrese el codeigo de la materia a la cual va a cargar notas: ";
+			cin >> intaux; cout << endl;
+
+			Node<Curso>* searchResultCurso = NULL;
+			searchResultCurso = buscarCurso(intaux);
+
+			if (searchResultCurso == NULL) {
+				cout << "Error: Curso no encontrado" << endl;
+				return;
+			}
+
+			Node<Estudiante>* sentinelEstudiante = listadoEstudiantes.getSentinel();
+			Node<Estudiante>* currentEstudiante = sentinelEstudiante->getPrevious();
+			Estudiante EstudianteModificable = currentEstudiante->getKey();
+
+
+			Node<CursoEstudiante>* sentinelCurso = NULL;
+			Node<CursoEstudiante>* currentCurso = NULL;
+			CursoEstudiante CursoEstudianteModificable;
+
+
+			while (currentEstudiante != sentinelEstudiante) {
+				
+				sentinelCurso = EstudianteModificable.getListaCursos().getSentinel();
+				currentCurso = sentinelCurso->getPrevious();
+				CursoEstudianteModificable = currentCurso->getKey();
+
+				while (currentCurso != sentinelCurso) {
+					
+					if ((string)searchResultCurso->getKey().getNombreCurso() == (string)CursoEstudianteModificable.getNombreCurso()) {
+						cout << "Estudiante: " << EstudianteModificable.getNombreEstudiante() << endl;
+						cout << "Ingrese nota examen " << CursoEstudianteModificable.getEvalRealiz() + 1 << ": ";
+						cin >> intaux; cout << endl;
+
+						CursoEstudianteModificable.cargarNota(intaux);
+
+						currentCurso->setKey(CursoEstudianteModificable);
+
+					}
+					
+					currentCurso = currentCurso->getPrevious();
+					CursoEstudianteModificable = currentCurso->getKey();
+				}
+
+				currentEstudiante->setKey(EstudianteModificable);
+
+				currentEstudiante = currentEstudiante->getPrevious();
+				EstudianteModificable = currentEstudiante->getKey();
+			}
+
+			cout << "Notas Cargadas con exito... " << endl;
+		}
+
+		void imprimirListadoProfesoresCursos() {
+			Node<Curso>* sentinel = NULL;
+			Node<Curso>* current = NULL;
+
+			sentinel = listadoCursos.getSentinel();
+			current = sentinel->getPrevious();
+
+			while (current != sentinel) {
+				
+				cout << "Nombre Curso: " << current->getKey().getNombreCurso() << " Nombre Profesor: " << current->getKey().getNombreProfesor() << endl;
+
+				current = current->getPrevious();
+			}
+
+		}
+
+		void guardarListaProfesores() {
+			fstream ListaProfesores("ListaProfesores.bin", ios::binary | ios::out);
+			
+			int nProfesores;
+			Node<Profesor>* sentinel = listadoProfesores.getSentinel();
+			Node<Profesor>* current = sentinel->getPrevious();
+			Profesor aGuardar = current->getKey();
+
+			Node<CursoProfesor>* sentinelCursoProf = NULL;
+			Node<CursoProfesor>* currentCursoProf = NULL;
+
+			while (current != sentinel) {
+				
+				ListaProfesores.write(reinterpret_cast<char*> (&aGuardar), sizeof(Profesor));
+
+				int nCursos = aGuardar.getListaCursos().getNElements();
+
+				ListaProfesores.write(reinterpret_cast<char*> (&nCursos), sizeof(int));
+
+				sentinelCursoProf = aGuardar.getListaCursos().getSentinel();
+				currentCursoProf = sentinelCursoProf->getPrevious();
+
+				while (currentCursoProf != sentinelCursoProf) {
+					
+
+					char strAux[StringLength];
+
+					strcpy_s(strAux, currentCursoProf->getKey().getNombreCurso());
+
+					ListaProfesores.write(reinterpret_cast<char*> (&strAux), sizeof(strAux));
+				}
+
+				current = current->getPrevious();
+			}
+		}
 };
 
 //FUNCION PRINCIPAL
@@ -868,5 +986,13 @@ int main(int args, char* argsv[]) {
 	moduloPrueba.agregarCursoAEstu();
 	moduloPrueba.agregarCursoAEstu();
 	moduloPrueba.agregarCursoAEstu();
+
+	moduloPrueba.cargarNotaCurso();
+	moduloPrueba.cargarNotaCurso();
+	moduloPrueba.cargarNotaCurso();
+
+	moduloPrueba.imprimirListadoProfesoresCursos();
+
+	moduloPrueba.guardarListaProfesores();
 	return 0;
 }
